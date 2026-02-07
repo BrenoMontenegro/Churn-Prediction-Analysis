@@ -86,15 +86,25 @@ df.groupby("Geography")["Exited"].mean().sort_values(ascending=False) * 100
 """- 32.44% dos clientes cancelaram na Alemanha.
 - 16.67% cancelaram na Espanha.
 - 16.15% cancelaram na França.
-
-## Churn por gênero
 """
 
+import matplotlib.pyplot as plt
+
+df.groupby('Geography')['Exited'].mean().plot(kind='bar')
+
+"""## Churn por gênero"""
+
 df.groupby("Gender")["Exited"].mean() * 100
+
+df.groupby('Gender')['Exited'].mean().plot(kind='bar')
 
 """## Idade por Churn"""
 
 df.groupby("Exited")["Age"].mean()
+
+import seaborn as sns
+
+sns.histplot(data=df, x='Age', hue='Exited', bins=30)
 
 """## Número de produtos contratados por Churn"""
 
@@ -104,12 +114,22 @@ df.groupby("NumOfProducts")["Exited"].mean()
 
 df.groupby("Exited")["Balance"].mean()
 
+sns.boxplot(x='Exited', y='Balance', data=df)
+
 """## Atividades e cartão de crédito"""
 
 df.groupby("IsActiveMember")["Exited"].mean() * 100
 
 df.groupby("HasCrCard")["Exited"].mean() * 100
 
+df.groupby("HasCrCard")["Exited"].mean().plot(kind='bar')
+
 """## Correlação"""
 
 df.corr(numeric_only=True)
+
+"""## Implementando Modelos de Inteligência Artificial
+
+Área dedicada a Machine Learning e uso de modelos de IA
+"""
+
