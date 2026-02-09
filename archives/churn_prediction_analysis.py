@@ -122,8 +122,6 @@ df.groupby("IsActiveMember")["Exited"].mean() * 100
 
 df.groupby("HasCrCard")["Exited"].mean() * 100
 
-df.groupby("HasCrCard")["Exited"].mean().plot(kind='bar')
-
 """## Correlação"""
 
 df.corr(numeric_only=True)
@@ -131,5 +129,77 @@ df.corr(numeric_only=True)
 """## Implementando Modelos de Inteligência Artificial
 
 Área dedicada a Machine Learning e uso de modelos de IA
+
+### 1) O primeiro modelo será de Regressão Lasso
 """
 
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import train_test_split
+
+X = df.drop(columns=["Exited"])
+y = df["Exited"]
+
+X = pd.get_dummies(X, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size = 0.3, random_state= 42
+)
+
+modelo_lasso = Lasso(alpha=0.1)
+modelo_lasso.fit(X_train,y_train)
+y_pred = modelo_lasso.predict(X_test)
+print("R² teste:", modelo_lasso.score(X_test,y_test))
+
+"""O coeficiente de determinação (R²) indica um resultado ruim para a previsão do modelo de regressão Lasso, aproximadamente 9% apenas. Isso demonstra como esse modelo não é apto para prever uma situação de Churn (Desistência). Porém, é interessante colocar este modelo aqui para comparar com os outros mais aptos a aprender com esses tipos de dados.
+
+### 2) Em seguida, será utilizado o Random Forest
+"""
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+
+modelo_random_forest = RandomForestClassifier(
+    n_estimators=200,
+    random_state=42,
+    class_weight="balanced"
+)
+
+modelo_random_forest.fit(X_train, y_train)
+
+y_pred = modelo_random_forest.predict(X_test)
+y_proba = modelo_random_forest.predict_proba(X_test)[:,1]
+
+print("Acurácia:", accuracy_score(y_test,y_pred))
+print("ROC-AUC:", roc_auc_score(y_pred, y_proba))
+print(classification_report(y_test, y_pred))
+
+"""Com uma Acurácia de 85%, o modelo Random Forest Classifier se mostrou muito mais apto para a previsão dos valores da coluna que o Regressão Lasso. Desse modo, já é possível entender que em problemas de classificação, como no caso da coluna de Exited (0 para não e 1 para sim), modelos voltados para classificação até mesmo binária são ótimos na generalização de dados, alavancando seu aprendizado. Essa decisão foi importante para mostrar que não é qualquer modelo capaz de aprender com esses tipos de dados, é preciso envolver uma análise de negócio antes de aplicar o mais apropriado.
+
+### 3) Por último, será testado o modelo de Regressão Logística
+"""
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled  = scaler.transform(X_test)
+
+modelo = LogisticRegression(
+    max_iter=1000,
+    class_weight="balanced",
+    random_state=42
+)
+
+modelo.fit(X_train_scaled, y_train)
+
+y_pred = modelo.predict(X_test_scaled)
+y_proba = modelo.predict_proba(X_test_scaled)[:,1]
+print("Acurácia:", accuracy_score(y_test, y_pred))
+print("ROC-AUC:", roc_auc_score(y_test, y_proba))
+print(classification_report(y_test, y_pred))
