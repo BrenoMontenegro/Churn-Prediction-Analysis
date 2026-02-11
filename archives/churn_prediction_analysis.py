@@ -203,3 +203,38 @@ y_proba = modelo.predict_proba(X_test_scaled)[:,1]
 print("Acurácia:", accuracy_score(y_test, y_pred))
 print("ROC-AUC:", roc_auc_score(y_test, y_proba))
 print(classification_report(y_test, y_pred))
+
+"""### Otimização de Hiperparâmetros
+
+Uma parte importante da pipeline de machine learning é otimizar hiperparâmetros. No caso do random forest, ele obteve uma ótima acurácia mesmo sem a otimização, porém ainda deve ser investigado se há espaço para melhoria.
+O modelo de regressão logística teve acurácia inferior ao random forest, talvez seja interessante testar a otimização para ver se é possível melhorar sua acurácia.
+
+### Otimização em Random Forest
+"""
+
+from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    "n_estimators": [50, 100, 200],
+    "max_depth": [None, 5, 10],
+    "min_samples_split": [2, 5],
+    "min_samples_leaf": [1, 2]
+}
+
+grid = GridSearchCV(
+    RandomForestClassifier(random_state=42, class_weight="balanced"),
+    param_grid = param_grid,
+    scoring = "roc_auc",
+    cv = 3,
+    n_jobs=-1
+)
+
+grid.fit(X_train, y_train)
+
+print("Melhores parâmetros:", grid.best_params_)
+print("Melhor score na validação cruzada:", grid.best_score_)
+
+"""Foi possível constatar que a validação cruzada encontrou os melhores hiperparâmetros para o modelo.
+
+### Otimização em Regressão Logística
+"""
