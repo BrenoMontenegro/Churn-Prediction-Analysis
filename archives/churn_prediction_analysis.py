@@ -8,6 +8,8 @@ Original file is located at
 
 # Projeto de Análise de Churn
 
+---
+
 Churn representa a saída de clientes de um serviço ou empresa em determinado período. Esse indicador é fundamental para negócios que dependem de retenção, pois a perda de clientes impacta diretamente a receita e o crescimento da organização.
 
 Neste projeto, aplicamos técnicas de Análise de Dados e Machine Learning para prever quais clientes possuem maior probabilidade de evasão. Foram realizadas etapas de preparação dos dados, modelagem com algoritmos de classificação (como Regressão Logística e Random Forest) e avaliação de desempenho utilizando métricas adequadas, como ROC-AUC.
@@ -268,9 +270,11 @@ Além disso, a análise de correlação auxilia na detecção de variáveis alta
 
 df.corr(numeric_only=True)
 
-"""## Implementando Modelos de Inteligência Artificial
+"""## Implementando Modelos de Aprendizado de Máquina
 
-Área dedicada a Machine Learning e uso de modelos de IA
+---
+
+**Seção destinada à aplicação de técnicas de Machine Learning, envolvendo a construção, treinamento e avaliação de modelos de Inteligência Artificial para análise e extração de padrões em dados**.
 
 ### 1) O primeiro modelo será de Regressão Lasso
 """
@@ -294,6 +298,10 @@ print("R² teste:", modelo_lasso.score(X_test,y_test))
 
 """O coeficiente de determinação (R²) indica um resultado ruim para a previsão do modelo de regressão Lasso, aproximadamente 9% apenas. Isso demonstra como esse modelo não é apto para prever uma situação de Churn (Desistência). Porém, é interessante colocar este modelo aqui para comparar com os outros mais aptos a aprender com esses tipos de dados.
 
+Isso ocorre porque a variável Churn assume valores binários (0 e 1), que correspondem a categorias e não a uma escala numérica contínua. Assim, 0 representa “não” e 1 representa “sim”, configurando uma variável categórica binária.
+
+Dessa forma, modelos de regressão, voltados a realizar previsões em colunas com valores numéricos, não são as melhores escolhas para estes tipos de problemas. Contudo, é interessante observar como eles podem "reagir" com bastante confusão em cenários de problemas envolvendo classificação.
+
 ### 2) Em seguida, será utilizado o Random Forest
 """
 
@@ -315,7 +323,9 @@ print("Acurácia:", accuracy_score(y_test,y_pred))
 print("ROC-AUC:", roc_auc_score(y_pred, y_proba))
 print(classification_report(y_test, y_pred))
 
-"""Com uma Acurácia de 85%, o modelo Random Forest Classifier se mostrou muito mais apto para a previsão dos valores da coluna que o Regressão Lasso. Desse modo, já é possível entender que em problemas de classificação, como no caso da coluna de Exited (0 para não e 1 para sim), modelos voltados para classificação até mesmo binária são ótimos na generalização de dados, alavancando seu aprendizado. Essa decisão foi importante para mostrar que não é qualquer modelo capaz de aprender com esses tipos de dados, é preciso envolver uma análise de negócio antes de aplicar o mais apropriado.
+"""Com uma Acurácia de 85%, o modelo Random Forest Classifier se mostrou muito mais apto para a previsão dos valores da coluna que o Regressão Lasso.
+
+Desse modo, já é possível entender que em problemas de classificação, como no caso da coluna de Exited (0 para não e 1 para sim), modelos voltados para classificação, até mesmo binária, são ótimos na generalização de dados, alavancando seu aprendizado. Essa decisão foi importante para mostrar que não é qualquer modelo capaz de aprender com esses tipos de dados, é preciso envolver uma análise de negócio antes de aplicar o mais apropriado.
 
 ### 3) Por último, será testado o modelo de Regressão Logística
 """
@@ -346,7 +356,13 @@ print("Acurácia:", accuracy_score(y_test, y_pred))
 print("ROC-AUC:", roc_auc_score(y_test, y_proba))
 print(classification_report(y_test, y_pred))
 
-"""### Otimização de Hiperparâmetros
+"""O modelo de Regressão Logística apresentou **acurácia de 69,67%** e **ROC-AUC de 0,62**, indicando capacidade moderada de discriminação.
+
+Observa-se bom desempenho na classe 0 (não churn), com F1-score de 0,80. No entanto, para a classe 1 (churn), o modelo apresentou desempenho inferior (F1-score de 0,37), com baixa precisão e recall.
+
+Isso indica que o modelo tem dificuldade em identificar corretamente os clientes que realmente cancelam, sendo necessário aprimorar o tratamento do desbalanceamento ou testar outras abordagens.
+
+### Otimização de Hiperparâmetros
 
 Uma parte importante da pipeline de machine learning é otimizar hiperparâmetros. No caso do random forest, ele obteve uma ótima acurácia mesmo sem a otimização, porém ainda deve ser investigado se há espaço para melhoria.
 O modelo de regressão logística teve acurácia inferior ao random forest, talvez seja interessante testar a otimização para ver se é possível melhorar sua acurácia.
@@ -387,7 +403,14 @@ print("Acurácia:", accuracy_score(y_test, y_pred))
 print("ROC-AUC:", roc_auc_score(y_test, y_proba))
 print(classification_report(y_test, y_pred))
 
-"""### Otimização em Regressão Logística"""
+"""Após a aplicação de GridSearch com validação cruzada para otimização dos hiperparâmetros, o modelo de Random Forest apresentou melhora significativa em relação ao anterior, alcançando acurácia de 86,2% e ROC-AUC de 0,86, indicando bom poder de discriminação.
+
+O desempenho na classe 0 foi excelente (F1-score de 0,92). Já na classe 1 (churn), houve melhora em relação ao modelo anterior, com **precision de 0,79**, porém o **recall de 0,44** ainda indica dificuldade em identificar todos os clientes que realmente cancelam.
+
+De modo geral, o modelo mostrou evolução consistente após a otimização, mas ainda há espaço para aprimorar a sensibilidade na detecção de churn.
+
+### Otimização em Regressão Logística
+"""
 
 param_grid = {
     "C": [0.01, 0.1, 1, 10],
@@ -417,3 +440,20 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 
 print("Acurácia:", accuracy_score(y_test, y_pred))
 print("ROC-AUC (teste):", roc_auc_score(y_test, y_proba))
+
+"""Após a aplicação da **Regressão Logística**, o modelo apresentou **acurácia de 69,17%** e **ROC-AUC de 0,67** no conjunto de teste.
+
+Embora a acurácia seja moderada, o ROC-AUC indica um poder de discriminação apenas razoável, sugerindo que o modelo possui capacidade limitada para separar corretamente clientes que realizam churn dos que permanecem.
+
+De forma geral, o desempenho foi inferior ao obtido com Random Forest, indicando que modelos mais robustos podem ser mais adequados para o problema.
+
+## Conclusão
+
+---
+
+O objetivo deste projeto foi desenvolver modelos capazes de prever o churn de clientes, identificando aqueles com maior probabilidade de cancelamento.
+
+Entre os modelos avaliados, o Random Forest Classifier apresentou os melhores resultados, com maior acurácia e melhor capacidade de discriminação (ROC-AUC), especialmente após a otimização de hiperparâmetros com GridSearch e validação cruzada.
+
+Dessa forma, o Random Forest mostrou-se mais adequado para o problema proposto, oferecendo desempenho superior em relação à Regressão Logística na tarefa de previsão de churn.
+"""
